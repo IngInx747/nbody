@@ -126,7 +126,7 @@ void compute_forces_multi_set(Body * local, Body * remote, double dt, int nlocal
 	#ifdef OPENMP
 	#pragma omp parallel for schedule(static) shared(local, remote, nlocal, nremote, dt, G, softening)
 	#endif
-	for (int i = 0; i < nlocal; i++) { 
+	for (int i = 0; i < nlocal; i++) {
 
 		double Fx = 0.0;
 		double Fy = 0.0;

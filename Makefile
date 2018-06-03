@@ -7,7 +7,7 @@ MPI         = yes
 OPTIMIZE    = yes
 DEBUG       = no
 PROFILE     = no
-OPENMP      = no
+OPENMP      = yes
 
 #===============================================================================
 # Program name & source code list

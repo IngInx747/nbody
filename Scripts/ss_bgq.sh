@@ -1,0 +1,1 @@
+qsub -A MPCS51087 -t 15 -n 32 --mode c64 ./nbody-parallel.exe -n 102400 -i 10 -t 1
