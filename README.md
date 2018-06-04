@@ -1,7 +1,7 @@
-# nbody_serial
-A serial solver for the N-Body gravitational force problem in 3D.
+# nbody
+A solver for the N-Body gravitational force problem in 3D.
 
-This code was written as a starting point for Problem Set 6 in
+This code was written for Problem Set 6 in
 MPCS 51087 at the University of Chicago.
 
 ## Compilation
@@ -22,8 +22,36 @@ command line argument.
 command line argument
 
 ## Running
+Usage:
+
+$> ./nbody-<MODE>.exe [args]
+
+	$> -n --particles: number of bodies
+
+	$> -i --iterations: number of timesteps
+
+	$> -t --threads: number of threads
+
 example:
 
-$> ./nbody 1000 10 4
+$> ./nbody-serial.exe --particles=1000 --iterations=1000
 
-will simulate 1000 bodies for 10 timesteps, using 4 OpenMP threads per rank.
+will simulate 1000 bodies for 1000 timesteps, serially.
+
+$> ./nbody-parallel.exe --threads=16 --particles=1000 --iterations=1000
+
+will simulate 1000 bodies for 1000 timesteps, using 16 OpenMP threads per rank.
+
+## Plot
+Usage:
+
+$> python plotter.py -f <Datafile> -s <Output>.mp4 -n <Particles> -i <Iterations>
+
+example:
+
+$> python plotter.py -f data-nbody-parallel.dat -s vedio-nbody-parallel.mp4 -n 1000 -i 1000
+
+## Correctness
+The program generates binary data so one cannot use diff or cmp command in Unix
+
+to check whether two files are identical or not.

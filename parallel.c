@@ -96,6 +96,7 @@ void run_parallel_problem(int nBodies, double dt, int nIters, char * fname) {
 
 	// Close data file
 	MPI_File_close(&fh);
+	MPI_Type_free(&TYPE_BODY);
 
 	double stop = get_time();
 
@@ -190,10 +191,11 @@ void distributed_write_timestep(Body * local_bodies, long nBodies,
 		return;
 	}
 
-	int offset, length;
+	int offset, length, byte_offset;
 	double * dbuffer;
 
 	length = jobs_manage(nBodies, mype, nprocs, &offset);
+	byte_offset = (iter * nBodies + offset) * 3 * sizeof(double);
 	dbuffer = (double*) calloc(3 * length, sizeof(double));
 
 	for (int i=0; i<length; i++) {
@@ -202,8 +204,12 @@ void distributed_write_timestep(Body * local_bodies, long nBodies,
 		dbuffer[3*i + 2] = local_bodies[i].z;
 	}
 
-	MPI_File_seek(*fh, (iter*nBodies + offset) * 3*sizeof(double), MPI_SEEK_SET);
-	MPI_File_write(*fh, dbuffer, 3 * length, MPI_DOUBLE, MPI_STATUS_IGNORE);
+	//MPI_File_seek(*fh, (iter*nBodies + offset) * 3*sizeof(double), MPI_SEEK_SET);
+	//MPI_File_write(*fh, dbuffer, 3 * length, MPI_DOUBLE, MPI_STATUS_IGNORE);
+	MPI_File_set_view(*fh, byte_offset, MPI_DOUBLE, MPI_DOUBLE, "native", MPI_INFO_NULL) ;
+	MPI_File_write_all(*fh, dbuffer, 3 * length, MPI_DOUBLE, MPI_STATUS_IGNORE);
+
+	free(dbuffer);
 }
 
 // Rank job size management
