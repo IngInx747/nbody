@@ -38,7 +38,7 @@ $> ./nbody-serial.exe --particles=1000 --iterations=1000
 
 will simulate 1000 bodies for 1000 timesteps, serially.
 
-$> ./nbody-parallel.exe --threads=16 --particles=1000 --iterations=1000
+$> mpirun -n 4 ./nbody-parallel.exe --threads=16 --particles=1000 --iterations=1000
 
 will simulate 1000 bodies for 1000 timesteps, using 16 OpenMP threads per rank.
 
