@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --time=01:00:00
+#SBATCH --time=00:10:00
 #SBATCH --partition=sandyb
 #SBATCH --nodes=8
 #SBATCH --ntasks-per-node=16

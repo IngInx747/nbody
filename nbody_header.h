@@ -47,10 +47,10 @@ double uniform_rand(double mu, double sigma);
 
 // parallel.c
 #ifdef MPI
-void run_parallel_problem(int nBodies, double dt, int nIters, char * fname);
-void compute_forces_multi_set(Body * local, Body * remote, double dt, int nlocal, int nremote);
-void parallel_randomizeBodies(Body * bodies, int nBodies, int mype, int nprocs);
+void run_parallel_problem(long nBodies, double dt, long nIters, char * fname);
+void compute_forces_multi_set(Body * local, Body * remote, double dt, long nlocal, long nremote);
+void parallel_randomizeBodies(Body * bodies, long nBodies, int mype, int nprocs);
 void distributed_write_timestep(Body * local_bodies, long nBodies,
-	int timestep, int nIters, int nprocs, int mype, MPI_File * fh);
-int jobs_manage(int nBodies, int mype, int nprocs, int * iptr);
+	long timestep, long nIters, int nprocs, int mype, MPI_File * fh);
+long jobs_manage(long nBodies, int mype, int nprocs, long * iptr);
 #endif

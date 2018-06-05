@@ -30,8 +30,8 @@ def get_data(ifilename, nParticles, nIterations):
     Read binary file and turn raw data into format: Matrix[T][N][3]
     '''
     
-    # get double
-    data = np.fromfile(ifilename)
+    # get double, "<f8": little-endian double; ">f8": little-endian double
+    data = np.fromfile(ifilename, np.dtype('<f8'))
     # get float
     #data = np.fromfile(ifilename, np.float32)
 

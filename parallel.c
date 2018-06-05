@@ -1,9 +1,10 @@
 #include "nbody_header.h"
 
 #ifdef MPI
-void run_parallel_problem(int nBodies, double dt, int nIters, char * fname) {
+void run_parallel_problem(long nBodies, double dt, long nIters, char * fname) {
 
-	int mype, nprocs, nglobal, nlocal, nremote, offset;
+	int mype, nprocs;
+	long nglobal, nlocal, nremote, offset;
 	MPI_Status status;
 	MPI_File fh;
 
@@ -60,7 +61,7 @@ void run_parallel_problem(int nBodies, double dt, int nIters, char * fname) {
 	double start = get_time();
 
 	// Loop over timesteps
-	for (int iter = 0; iter < nIters; iter++) {
+	for (long iter = 0; iter < nIters; iter++) {
 
 		if (mype == 0 && (iter*100) % nIters == 0 ) write(STDOUT_FILENO, ".", 2);
 
@@ -109,7 +110,7 @@ void run_parallel_problem(int nBodies, double dt, int nIters, char * fname) {
 		printf("SIMULATION COMPLETE\n");
 		printf("Runtime [s]:              %.3le\n", runtime);
 		printf("Runtime per Timestep [s]: %.3le\n", time_per_iter);
-		printf("interactions:             %d\n", nIters);
+		printf("interactions:             %ld\n", nIters);
 		printf("Interactions per sec:     %.3le\n", interactions_per_sec);
 	}
 
@@ -118,7 +119,7 @@ void run_parallel_problem(int nBodies, double dt, int nIters, char * fname) {
 	free(outgoings);
 }
 
-void compute_forces_multi_set(Body * local, Body * remote, double dt, int nlocal, int nremote) {
+void compute_forces_multi_set(Body * local, Body * remote, double dt, long nlocal, long nremote) {
 
 	double G = 6.67259e-3;
 	double softening = 1.0e-5;
@@ -127,13 +128,13 @@ void compute_forces_multi_set(Body * local, Body * remote, double dt, int nlocal
 	#ifdef OPENMP
 	#pragma omp parallel for schedule(static) shared(local, remote, nlocal, nremote, dt, G, softening)
 	#endif
-	for (int i = 0; i < nlocal; i++) {
+	for (long i = 0; i < nlocal; i++) {
 
 		double Fx = 0.0;
 		double Fy = 0.0;
 		double Fz = 0.0;
 
-		for (int j = 0; j < nremote; j++) {
+		for (long j = 0; j < nremote; j++) {
 
 			double dx = remote[j].x - local[i].x;
 			double dy = remote[j].y - local[i].y;
@@ -155,17 +156,17 @@ void compute_forces_multi_set(Body * local, Body * remote, double dt, int nlocal
 	}
 }
 
-void parallel_randomizeBodies(Body * bodies, int nBodies, int mype, int nprocs) {
+void parallel_randomizeBodies(Body * bodies, long nBodies, int mype, int nprocs) {
 
 	// velocity scaling term
 	double vm = 1.0e-3;
 
-	int nBodies_per_rank = jobs_manage(nBodies, mype, nprocs, NULL);
+	long nBodies_per_rank = jobs_manage(nBodies, mype, nprocs, NULL);
 
 	#ifdef OPENMP
 	#pragma omp parallel for schedule(static) shared(bodies, nBodies)
 	#endif
-	for (int i = 0; i < nBodies_per_rank; i++) {
+	for (long i = 0; i < nBodies_per_rank; i++) {
 		// Initialize position between -1.0 and 1.0
 		bodies[i].x = 2.0 * (rand() / (double)RAND_MAX) - 1.0;
 		bodies[i].y = 2.0 * (rand() / (double)RAND_MAX) - 1.0;
@@ -184,14 +185,15 @@ void parallel_randomizeBodies(Body * bodies, int nBodies, int mype, int nprocs) 
 
 // Writes all particle locations for a single timestep
 void distributed_write_timestep(Body * local_bodies, long nBodies,
-	int iter, int nIters, int nprocs, int mype, MPI_File * fh) {
+	long iter, long nIters, int nprocs, int mype, MPI_File * fh) {
 
 	if (!fh) {
 		perror("Null MPI file pointer");
 		return;
 	}
 
-	int offset, length, byte_offset;
+	long offset, length;
+	MPI_Offset byte_offset;
 	double * dbuffer;
 
 	length = jobs_manage(nBodies, mype, nprocs, &offset);
@@ -204,8 +206,11 @@ void distributed_write_timestep(Body * local_bodies, long nBodies,
 		dbuffer[3*i + 2] = local_bodies[i].z;
 	}
 
+	// IO Level 2
 	//MPI_File_seek(*fh, (iter*nBodies + offset) * 3*sizeof(double), MPI_SEEK_SET);
 	//MPI_File_write(*fh, dbuffer, 3 * length, MPI_DOUBLE, MPI_STATUS_IGNORE);
+
+	// IO Level 3
 	MPI_File_set_view(*fh, byte_offset, MPI_DOUBLE, MPI_DOUBLE, "native", MPI_INFO_NULL) ;
 	MPI_File_write_all(*fh, dbuffer, 3 * length, MPI_DOUBLE, MPI_STATUS_IGNORE);
 
@@ -213,9 +218,9 @@ void distributed_write_timestep(Body * local_bodies, long nBodies,
 }
 
 // Rank job size management
-int jobs_manage(int nBodies, int mype, int nprocs, int * iptr) {
+long jobs_manage(long nBodies, int mype, int nprocs, long * iptr) {
 
-	int offset, length, watershed, base;
+	long offset, length, watershed, base;
 
 	watershed = nBodies % nprocs;
 	base = nBodies / nprocs;
