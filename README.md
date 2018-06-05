@@ -24,7 +24,7 @@ command line argument
 ## Running
 Usage:
 
-$> ./nbody-<MODE>.exe [args]
+$> ./nbody-[MODE].exe [args]
 
 	$> -n --particles: number of bodies
 
@@ -47,7 +47,7 @@ Plotter receives binary data and transforms it into mp4 format file. Default dat
 
 Usage:
 
-$> python plotter.py -f <Datafile> -s <Output>.mp4 -n <Particles> -i <Iterations>
+$> python plotter.py -f [Datafile] -s [Output].mp4 -n [Particles] -i [Iterations]
 
 example:
 
