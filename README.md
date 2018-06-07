@@ -53,9 +53,11 @@ example:
 
 $> python plotter.py -f data-nbody-parallel.dat -s vedio-nbody-parallel.mp4 -n 1000 -i 1000
 
-## Correctness
-The program generates binary data so one cannot use diff or cmp command in Unix to check whether two files are identical or not.
+To be of better performance, the plotter will load the whole file at once. Sometime the data file is big that reach 10G. So make sure memory in your computer is enough and wait patiently. Don't be panic if your computer is slowly responding. One suggestion is that closing all unnecessary applications like web browser and chat window to save up memory.
 
-Use diff.py to check correctness. If nothing printed out, then two files are identical with regard to double.
+## Correctness
+The program generates binary data. As a little tricky problems when generating random number in MPI, one cannot use diff or cmp command in Unix to check whether two files are identical or not.
+
+Use diff.py to check correctness. If nothing printed out, then two files are identical in double.
 
 $> python diff data1 data2

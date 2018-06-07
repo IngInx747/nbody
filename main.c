@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
 	#ifdef MPI
 	run_parallel_problem(nBodies, dt, nIters, "data-nbody-parallel.dat");
 	#else
-	run_serial_problem(nBodies, dt, nIters, "data-nbody-serial.dat", randomizeBodies_default);
+	run_serial_problem(nBodies, dt, nIters, "data-nbody-serial.dat", randomizeBodies_spiral);
 	#endif
 
 	// Finalize MPI
